@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+Header set Access-Control-Allow-Origin "http://localhost:5000"
+Header set Access-Control-Allow-Methods "GET,PUT,POST,DELETE"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>

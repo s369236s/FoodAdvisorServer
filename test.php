@@ -1,11 +1,12 @@
-<?php 
-
-header("Access-Control-Allow-Origin: http://localhost:5000");
-if(isset($_POST)){
-    $data = json_decode(file_get_contents('php://input'), true);
-    print_r($data);
-}else{
-    echo "wrong";
+<?php
+$data = json_decode(file_get_contents('php://input'));
+if (isset($data)) {
+    $res=  [];
+    foreach($data as $key=>$value){
+        $res[$key] = $value;
+    }
+    echo json_encode($res);
+    echo $data['password'];
+} else {
 }
-
 ?>
