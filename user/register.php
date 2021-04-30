@@ -4,6 +4,7 @@ $req = json_decode(file_get_contents('php://input'));
 if (isset($req)) {
     $validErrors = [];
     $data =  [];
+    $req->password =  password_hash($req->password,PASSWORD_DEFAULT);
     foreach ($req as $key => $value) {
         $data[$key] = mysqli_real_escape_string($db, $value);
     }
@@ -19,14 +20,21 @@ if (isset($req)) {
     if (empty($data['confirmPassword'])) {
         array_push($validErrors, "ConfirmPassword can't be empty");
     }
+    
     if($validErrors){
        $res=[
         "ok"=>false,
+        "data"=>new stdClass(),
         "valid"=>$validErrors
     ];
     echo json_encode($res);
     die();
     }
+    $res=[
+        "ok"=>true,
+        "data"=>$data
+    ];
+    echo json_encode($res);
 } else {
 
 }

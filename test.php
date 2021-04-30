@@ -6,7 +6,7 @@ if (isset($data)) {
         $res[$key] = $value;
     }
     echo json_encode($res);
-    echo $data['password'];
+    // echo $data['password'];
 } else {
 }
 ?>
