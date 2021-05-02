@@ -5,26 +5,28 @@ $req = json_decode(file_get_contents('php://input'));
 if (isset($req)) {
     $validErrors = [];
     $data =  [];
-
     foreach ($req as $key => $value) {
         $data[$key] = mysqli_real_escape_string($db, $value);
     }
-    if (empty($data['username'])) {
-        array_push($validErrors, "Username can't be empty");
+    $username = mysqli_real_escape_string($db, $data['username']);
+    $email = mysqli_real_escape_string($db, $data['email']);
+    $password = mysqli_real_escape_string($db, $data['password']);
+    $confirm_Password = mysqli_real_escape_string($db, $data['confirmPassword']);
+    if (empty($username)) {
+        array_push($validErrors, "暱稱?");
     }
-    if (empty($data['password'])) {
-        array_push($validErrors, "Password can't be empty");
+    if (empty( $email)) {
+        array_push($validErrors, "信箱?");
     }
-    if (empty($data['email'])) {
-        array_push($validErrors, "Email can't be empty");
+    if (empty($password)) {
+        array_push($validErrors, "密碼?");
     }
-    if (empty($data['confirmPassword'])) {
-        array_push($validErrors, "ConfirmPassword can't be empty");
+    if (empty($confirm_Password)) {
+        array_push($validErrors, "重複密碼?");
     }
-    if ($data['password'] != $data['confirmPassword'] && !empty($data['password']) && !empty($data['confirmPassword'])) {
-        array_push($validErrors, "ConfirmPassword do not match with password");
+    if ($password != $confirm_Password && !empty($password) && !empty($confirm_Password)) {
+        array_push($validErrors, "密碼錯誤");
     }
-
     if ($validErrors) {
         $res = [
             "ok" => false,
@@ -33,18 +35,13 @@ if (isset($req)) {
         ];
         sendResponse($res, 203);
     }
-
-    $user_check_query = "SELECT * FROM users WHERE username=".$data['username']." OR email=".$data['email']." LIMIT 1";
+    $user_check_query = "SELECT * FROM users WHERE username='$username' OR email='$email' LIMIT 1";
     $result = mysqli_query($db, $user_check_query);
     $user = mysqli_fetch_assoc($result);
-
-    if ($user) { // if user exists
-        if ($user['username'] == $data['username']) {
-            array_push($validErrors, "Username already exists");
-        }
+    if ($user) { 
 
         if ($user['email'] == $data['email']) {
-            array_push($validErrors, "email already exists");
+            array_push($validErrors, "信箱重複");
         }
         $res = [
             "ok" => false,
@@ -54,14 +51,16 @@ if (isset($req)) {
         sendResponse($res, 203);
     }
 
+
     if (count($validErrors) == 0) {
-        $hashPassword =  password_hash($data['password'], PASSWORD_DEFAULT);
+        $hashPassword =  password_hash($data['password'], PASSWORD_BCRYPT);
         $query = "INSERT INTO users (username, email, password) 
-        VALUES(".$data['username'].", ".$data['email'].", '$hashPassword')";
+        VALUES('$username', '$email', '$hashPassword')";
         mysqli_query($db, $query);
         $res = [
             "ok" => true,
-            "data" => $data
+            "data" => new stdClass(),
+            "valid" => [],
         ];
         sendResponse($res, 201);
     }
@@ -69,6 +68,7 @@ if (isset($req)) {
 
 function sendResponse($json, $code)
 {
+    sleep(2);
     echo json_encode($json);
     http_response_code($code);
     die();

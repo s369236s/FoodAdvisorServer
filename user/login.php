@@ -1,4 +1,13 @@
-<?php 
+<?php
+
+header('Access-Control-Allow-Credentials: true');
+const ACCESS_TOKEN_SECRET = "imaccesstoken";
+const REFRESH_TOKEN_SECRET　 = "imrefreshtoken";
+
+use Firebase\JWT\JWT;
+
+require_once('../vendor/autoload.php');
+
 $db = mysqli_connect('localhost', 'test', 'yzu', 'test');
 $req = json_decode(file_get_contents('php://input'));
 if (isset($req)) {
@@ -26,8 +35,8 @@ if (isset($req)) {
     if (count($validErrors) == 0) {
         $query = "SELECT * FROM users WHERE email='$email'";
         $result = mysqli_query($db, $query);
-        $user= $result->fetch_assoc();
-        if(!$user){
+        $user = $result->fetch_assoc();
+        if (!$user) {
             array_push($validErrors, "信箱不存在");
             $res = [
                 "ok" => false,
@@ -37,15 +46,26 @@ if (isset($req)) {
             sendResponse($res, 203);
         }
         $dbPassword = $user['password'];
-
-        if ( password_verify($password, $dbPassword)) {
+        $dbUsername = $user['username'];
+        if (password_verify($password, $dbPassword)) {
+            $accessToken = createAccessToken($dbUsername,$email);
+            $refreshToken = createRefreshToken($dbUsername,$email);
+          
+            $arr_cookie_options = array (
+                'expires' => time() + 60*60*24*7,
+                'path' => '/',
+                'secure' => true,     // or false
+                'httponly' => true,    // or false
+                );
+            setcookie("jid",$refreshToken,$arr_cookie_options);
             $res = [
                 "ok" => true,
                 "data" => new stdClass(),
-                "valid" => $validErrors
+                "valid" => $validErrors,
+                "accessToken" => $accessToken,
             ];
-        sendResponse($res, 200);
-        }else {
+            sendResponse($res, 200);
+        } else {
             array_push($validErrors, "密碼錯誤");
             $res = [
                 "ok" => false,
@@ -55,11 +75,34 @@ if (isset($req)) {
             sendResponse($res, 203);
         }
     }
-  }
-  
+}
+
 function sendResponse($json, $code)
 {
+    sleep(1);
     echo json_encode($json);
     http_response_code($code);
     die();
+}
+
+function createAccessToken($username, $email)
+{
+    return JWT::encode([
+        "iat" => time(),
+        "nbf" => time(),
+        "exp" => time() + 7200, "data" => [
+            "email" => $email, "username" => $username
+        ]
+    ], ACCESS_TOKEN_SECRET);
+}
+
+function createRefreshToken($username, $email)
+{
+    return JWT::encode([
+        "iat" => time(),
+        "nbf" => time(),
+        "exp" => time() + 60*60*24*7, "data" => [
+            "email" => $email, "username" => $username
+        ]
+    ], REFRESH_TOKEN_SECRET　);
 }
