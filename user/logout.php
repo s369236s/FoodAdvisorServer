@@ -9,7 +9,6 @@ if(isset($_COOKIE['jid']))
         'expires' => time() - 60*60*24*7,
         'path' => '/',
         'secure' => true,     // or false
-        'httponly' => true,    // or false
         );
     setcookie("jid",$token,$arr_cookie_options);
     $res = [

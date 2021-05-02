@@ -19,7 +19,7 @@ $token=null;
 if(isset($_COOKIE['jid']))
 $token = $_COOKIE['jid'];
 
-if (!$token) sendResponse(new stdClass(), 203);
+if (!$token) sendResponse('no cookie', 203);
 
 $payload = [];
 $data=[];
