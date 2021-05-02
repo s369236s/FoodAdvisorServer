@@ -8,7 +8,6 @@ if(isset($_COOKIE['jid']))
     $arr_cookie_options = array (
         'expires' => time() - 60*60*24*7,
         'path' => '/',
-        'secure' => true,     // or false
         );
     setcookie("jid",$token,$arr_cookie_options);
     $res = [

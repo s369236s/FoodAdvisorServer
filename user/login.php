@@ -56,7 +56,6 @@ if (isset($req)) {
             $arr_cookie_options = array (
                 'expires' => time() + 60*60*24*7,
                 'path' => '/',
-                'secure' => true,     // or false
                 );
             setcookie("jid",$refreshToken,$arr_cookie_options);
             $res = [
