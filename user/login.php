@@ -8,7 +8,9 @@ use Firebase\JWT\JWT;
 
 require_once('../vendor/autoload.php');
 
-$db = mysqli_connect('localhost', 'test', 'yzu', 'test');
+// $db = mysqli_connect('localhost', 'test', 'yzu', 'test');
+$db = mysqli_connect('db4free.net:3306', 'foodadvisor123', 'foodadvisor', 'foodadvisor');
+
 $req = json_decode(file_get_contents('php://input'));
 if (isset($req)) {
     $validErrors = [];
@@ -79,7 +81,6 @@ if (isset($req)) {
 
 function sendResponse($json, $code)
 {
-    sleep(1);
     echo json_encode($json);
     http_response_code($code);
     die();

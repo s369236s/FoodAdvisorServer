@@ -62,7 +62,8 @@ try {
     ];
     sendResponse($res,203);
 }
-$db = mysqli_connect('localhost', 'test', 'yzu', 'test');
+// $db = mysqli_connect('localhost', 'test', 'yzu', 'test');
+$db = mysqli_connect('db4free.net:3306', 'foodadvisor123', 'foodadvisor', 'foodadvisor');
 
 $data = $payload['data'];
 $email = mysqli_real_escape_string($db, $data['email']);

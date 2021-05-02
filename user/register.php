@@ -1,5 +1,6 @@
 <?php
-$db = mysqli_connect('localhost', 'test', 'yzu', 'test');
+$db = mysqli_connect('db4free.net:3306', 'foodadvisor123', 'foodadvisor', 'foodadvisor');
+// $db = mysqli_connect('localhost', 'test', 'yzu', 'test');
 $req = json_decode(file_get_contents('php://input'));
 
 if (isset($req)) {
