@@ -1,35 +1,25 @@
 <?php 
 header('Access-Control-Allow-Credentials: true');
+require_once('../controller/send_response.php');
 $token= null;
 
 if(isset($_COOKIE['jid']))
 {
     $token = $_COOKIE['jid'];
-    $arr_cookie_options = array (
+    $cookie_options = array (
         'expires' => time() - 60*60*24*7,
         'path' => '/',
         );
-    setcookie("jid",$token,$arr_cookie_options);
-    $res = [
+    setcookie("jid",$token,$cookie_options);
+    $response = [
         "ok"=>true,
         "data"=>$_COOKIE['jid']
     ];
-    sendResponse($res,200);
-}
-else{
-    $res = [
-        "ok"=>false,
-        "data"=>$_COOKIE['jid']
-    ];
-    sendResponse($res,203);
-    die();
+    send_response($response,200);
 }
 
-function sendResponse($json, $code)
-{
-    // sleep(1);
-    echo json_encode($json);
-    http_response_code($code);
-    die();
-}
-?>
+$response = [
+    "ok"=>false,
+    "data"=>$_COOKIE['jid']
+];
+send_response($response,203);

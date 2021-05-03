@@ -1,107 +1,76 @@
-<?php
-
+<?php 
 header('Access-Control-Allow-Credentials: true');
-const ACCESS_TOKEN_SECRET = "imaccesstoken";
-const REFRESH_TOKEN_SECRET　 = "imrefreshtoken";
+require_once('../VAR/VAR.php');
+require_once('../controller/send_response.php');
+require_once('../controller/create_jwt.php');
+require_once('../module/jwt/src/JWT.php');
 
-use Firebase\JWT\JWT;
-
-require_once('../vendor/autoload.php');
-
-// $db = mysqli_connect('localhost', 'test', 'yzu', 'test');
-$db = mysqli_connect('db4free.net:3306', 'foodadvisor123', 'foodadvisor', 'foodadvisor');
-
-$req = json_decode(file_get_contents('php://input'));
-if (isset($req)) {
-    $validErrors = [];
+$db = mysqli_connect(DB, DBUSERNAME, DBPASSWORD, DBTABLE);
+$req_body = json_decode(file_get_contents('php://input'));
+if(isset($req_body)){
+    $valid_errors = [];
     $data =  [];
-    foreach ($req as $key => $value) {
+    foreach ($req_body as $key => $value) {
         $data[$key] = mysqli_real_escape_string($db, $value);
     }
     $email = mysqli_real_escape_string($db, $data['email']);
     $password = mysqli_real_escape_string($db, $data['password']);
-    if (empty($email)) {
-        array_push($validErrors, "信箱?");
-    }
-    if (empty($password)) {
-        array_push($validErrors, "密碼?");
-    }
-    if ($validErrors) {
-        $res = [
+    if(empty($email))
+    array_push($valid_errors,"信箱?");
+    if(empty($password))
+    array_push($valid_errors,"密碼?");
+    if($valid_errors){
+        $response = [
             "ok" => false,
             "data" => new stdClass(),
-            "valid" => $validErrors
+            "errors" => $valid_errors
         ];
-        sendResponse($res, 203);
+        send_response($response,203);
     }
-    if (count($validErrors) == 0) {
-        $query = "SELECT * FROM users WHERE email='$email'";
-        $result = mysqli_query($db, $query);
-        $user = $result->fetch_assoc();
-        if (!$user) {
-            array_push($validErrors, "信箱不存在");
-            $res = [
+
+    if(count($valid_errors)===0){
+        $db_query = "SELECT * FROM users WHERE email='$email'";
+        $query_result = mysqli_query($db,$db_query);
+        $user = $query_result->fetch_assoc();
+
+        if(!$user){
+            array_push($valid_errors,"信箱不存在");
+            $response=[
+                "ok"=>false,
+                "data"=> new stdClass(),
+                "errors"=>$valid_errors
+            ];
+            send_response($response,203);
+        }
+
+        $user_username = $user['username'];
+        $user_password = $user['password'];
+        
+        if(!password_verify($password,$user_password)){
+            array_push($valid_errors, "密碼錯誤");
+            $response = [
                 "ok" => false,
                 "data" => new stdClass(),
-                "valid" => $validErrors
+                "errors" => $valid_errors,
             ];
-            sendResponse($res, 203);
+            send_response($response, 203);
         }
-        $dbPassword = $user['password'];
-        $dbUsername = $user['username'];
-        if (password_verify($password, $dbPassword)) {
-            $accessToken = createAccessToken($dbUsername,$email);
-            $refreshToken = createRefreshToken($dbUsername,$email);
-          
-            $arr_cookie_options = array (
-                'expires' => time() + 60*60*24*7,
-                'path' => '/',
-                );
-            setcookie("jid",$refreshToken,$arr_cookie_options);
-            $res = [
-                "ok" => true,
-                "data" => new stdClass(),
-                "valid" => $validErrors,
-                "accessToken" => $accessToken,
-            ];
-            sendResponse($res, 200);
-        } else {
-            array_push($validErrors, "密碼錯誤");
-            $res = [
-                "ok" => false,
-                "data" => new stdClass(),
-                "valid" => $validErrors,
-            ];
-            sendResponse($res, 203);
-        }
+        $access_token = create_access_token($user_username,$email);
+        $refresh_token = create_refresh_token($user_username,$email);
+        $cookie_options = array (
+            'expires' => time() + 60*60*24*7,
+            'path' => '/',
+            );
+        setcookie("jid",$refresh_token,$cookie_options);
+        $response = [
+            "ok"=>true,
+            "data"=> new stdClass(),
+            "errors"=>$valid_errors,
+            "accessToken" =>$access_token
+        ];
+        send_response($response,200);
     }
+   
 }
 
-function sendResponse($json, $code)
-{
-    echo json_encode($json);
-    http_response_code($code);
-    die();
-}
-
-function createAccessToken($username, $email)
-{
-    return JWT::encode([
-        "iat" => time(),
-        "nbf" => time(),
-        "exp" => time() + 7200, "data" => [
-            "email" => $email, "username" => $username
-        ]
-    ], ACCESS_TOKEN_SECRET);
-}
-
-function createRefreshToken($username, $email)
-{
-    return JWT::encode([
-        "iat" => time(),
-        "nbf" => time(),
-        "exp" => time() + 60*60*24*7, "data" => [
-            "email" => $email, "username" => $username
-        ]
-    ], REFRESH_TOKEN_SECRET　);
-}
+?>
