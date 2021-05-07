@@ -24,7 +24,6 @@ $address = mysqli_real_escape_string($db, $data['address']);
 $number = mysqli_real_escape_string($db, $data['number']);
 $intro = mysqli_real_escape_string($db, $data['intro']);
 $main_area = mysqli_real_escape_string($db, $data['main_area']);
-
 if (empty($name)) {
     array_push($valid_errors, "餐廳名稱?");
 }
@@ -42,7 +41,8 @@ if($valid_errors){
     $response = [
         "ok" => false,
         "data" => $data,
-        "errors" => $valid_errors
+        "errors" => $valid_errors,
+        "n"=>$n
     ];
     send_response($response,203);
 } 
@@ -99,14 +99,16 @@ if (count($valid_errors) == 0) {
   $main_pic_path=  mysqli_real_escape_string($db,save_file($main_pic['data'],$main_pic['type']));
   $other_pic_1_path=  mysqli_real_escape_string($db,save_file($other_pic_1['data'],$other_pic_1['type']));
   $other_pic_2_path= mysqli_real_escape_string($db,save_file($other_pic_2['data'],$other_pic_2['type'])); 
-  $create_query = "INSERT INTO restaurants (id, name, review_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1,other_pic_2, owner_id) 
-        VALUES(null,'$name', 0, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path',11)";
+  $_id = bin2hex(openssl_random_pseudo_bytes(8));
+  $create_query = "INSERT INTO restaurants (id,_id, name, review_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1,other_pic_2, owner_id) 
+        VALUES(null,'$_id','$name', 0, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path',11)";
     mysqli_query($db, $create_query);
 
-   
+
     $response = [
         "ok" => true,
         "data" => $data,
+        "query"=>$create_query
     ];
 }
 

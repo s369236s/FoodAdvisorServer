@@ -13,7 +13,7 @@ while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
 if(!$data){
     $response = [
         "ok"=>false,
-        "data"=>new stdClass(),
+        "data"=>$data,
         "errors"=>"something wrong"
     ]; 
 send_response($response,203);
