@@ -19,7 +19,7 @@ foreach ($_POST as $key => $value) {
     $data[$key] = $value;
 }
 
-$restaurant_id = mysqli_real_escape_string($db, $data['id']);
+$user_id = mysqli_real_escape_string($db, $data['user_id']);
 $name = mysqli_real_escape_string($db, $data['name']);
 $address = mysqli_real_escape_string($db, $data['address']);
 $number = mysqli_real_escape_string($db, $data['number']);
@@ -43,7 +43,6 @@ if($valid_errors){
         "ok" => false,
         "data" => $data,
         "errors" => $valid_errors,
-        "n"=>$n
     ];
     send_response($response,203);
 } 
@@ -102,7 +101,7 @@ if (count($valid_errors) == 0) {
   $other_pic_2_path= mysqli_real_escape_string($db,save_file($other_pic_2['data'],$other_pic_2['type'])); 
   $_id = bin2hex(openssl_random_pseudo_bytes(8));
   $create_query = "INSERT INTO restaurants (id,_id, name, review_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1,other_pic_2, owner_id) 
-        VALUES(null,'$_id','$name', 0, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path',11)";
+        VALUES(null,'$_id','$name', 0, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path','$user_id')";
     mysqli_query($db, $create_query);
 
 
