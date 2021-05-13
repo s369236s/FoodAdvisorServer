@@ -19,6 +19,7 @@ foreach ($_POST as $key => $value) {
     $data[$key] = $value;
 }
 
+$restaurant_id = mysqli_real_escape_string($db, $data['id']);
 $name = mysqli_real_escape_string($db, $data['name']);
 $address = mysqli_real_escape_string($db, $data['address']);
 $number = mysqli_real_escape_string($db, $data['number']);

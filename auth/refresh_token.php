@@ -51,7 +51,7 @@ if(!$user){
 }
 $response = [
     "ok"=>true,
-    "data"=>new stdClass(),
+    "_id"=>$user['_id'],
     "accessToken" => create_access_token($username,$email)
 ];
 send_response($response,200);
