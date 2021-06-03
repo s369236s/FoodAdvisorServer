@@ -92,17 +92,42 @@ if($pic['size']>2){
 if (count($valid_errors) == 0) {
     $pic_path=  mysqli_real_escape_string($db,save_file($pic['data'],$pic['type']));
     $_id = bin2hex(openssl_random_pseudo_bytes(8));
-    $create_query = "INSERT INTO comments (id, _id, content, title, review_star, food_star, speed_star, pic, user_id, restaurant_id) VALUES (NULL, '$_id', '$content', '$title', '$review_star', '$food_star', '$speed_star', '$pic_path', '$user_id', '$restaurant_id')";
+    $comment_date = date("Y-m-d H:i:s");
+    $create_query = "INSERT INTO comments (id, _id, content, title, review_star, food_star, speed_star, pic, user_id, restaurant_id,comment_date,price_star) VALUES (NULL, '$_id', '$content', '$title', '$review_star', '$food_star', '$speed_star', '$pic_path', '$user_id', '$restaurant_id','$comment_date','$price_star')";
       mysqli_query($db, $create_query);
-
+      $comments_query = "SELECT review_star,food_star,speed_star,price_star FROM comments WHERE restaurant_id='$restaurant_id'";
+      $comments_query_result = mysqli_query($db, $comments_query);
+      $comments = [];
+      $comments_len = 0;
+      $total_review_star=0;
+      $total_speed_star=0;
+      $total_food_star=0;
+      $total_price_star=0;
+      while($row = mysqli_fetch_array($comments_query_result, MYSQLI_ASSOC))
+      {
+        $comments_len++;
+        $total_review_star+= $row['review_star'];
+        $total_food_star+= $row['food_star'];
+        $total_price_star+= $row['price_star'];
+        $total_speed_star+= $row['speed_star'];
+        array_push($comments,$row);
+      }
+    $new_price_star = $total_price_star/$comments_len;
+    $new_speed_star = $total_speed_star/$comments_len;
+    $new_food_star = $total_food_star/$comments_len;
+    $new_review_star = $total_review_star/$comments_len;
+    $update_query = "UPDATE restaurants SET review_star='$new_review_star',food_star='$new_food_star',speed_star='$new_speed_star',price_star='$new_price_star' WHERE _id='$restaurant_id'";
+    mysqli_query($db, $update_query);
       $response = [
           "ok" => true,
           "data" => $data,
-          "query"=>$create_query
+          "err"=>$new_price_star
       ];
+
+
   }
   
-
+   
   send_response($response, 200);
 
 

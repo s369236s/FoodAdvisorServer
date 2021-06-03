@@ -101,15 +101,20 @@ if (count($valid_errors) == 0) {
   $other_pic_2_path= mysqli_real_escape_string($db,save_file($other_pic_2['data'],$other_pic_2['type'])); 
   $_id = bin2hex(openssl_random_pseudo_bytes(8));
   $create_query = "INSERT INTO restaurants (id,_id, name, review_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1,other_pic_2, owner_id) 
-        VALUES(null,'$_id','$name', 0, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path','$user_id')";
-    mysqli_query($db, $create_query);
-
-
+        VALUES(null,'$_id','$name', 0.5, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path','$user_id')";
+   if(mysqli_query($db, $create_query)){
     $response = [
         "ok" => true,
         "data" => $data,
-        "query"=>$create_query
     ];
+   }else{
+    $response = [
+        "ok" => false,
+        "data" => $db->error,
+    ];
+   }
+   
+  
 }
 
 

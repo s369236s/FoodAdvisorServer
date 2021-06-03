@@ -4,7 +4,7 @@ require_once('../VAR/VAR.php');
 require_once('../controller/send_response.php');
 $db = mysqli_connect(DB, DBUSERNAME, DBPASSWORD, DBTABLE);
 $_id = $_GET['id'];
-$restaurant_query = "SELECT name, review_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1, other_pic_2, owner_id FROM restaurants WHERE _id='$_id' LIMIT 1";
+$restaurant_query = "SELECT name, review_star,food_star,speed_star,price_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1, other_pic_2, owner_id FROM restaurants WHERE _id='$_id' LIMIT 1";
 $query_result = mysqli_query($db, $restaurant_query);
 $restaurant = $query_result->fetch_assoc();
 if(!$restaurant){
