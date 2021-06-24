@@ -63,8 +63,9 @@ if(isset($req_body)){
     if (count($valid_errors) == 0) {
         $hashPassword =  password_hash($data['password'], PASSWORD_BCRYPT);
         $_id = bin2hex(openssl_random_pseudo_bytes(8));
-        $create_query = "INSERT INTO users (_id,username, email, password) 
-        VALUES('$_id','$username', '$email', '$hashPassword')";
+        $foo = "";
+        $create_query = "INSERT INTO users (_id,username, email, password,intro,pic,address,recent_comment_1,recent_comment_2,recent_comment_3) 
+        VALUES('$_id','$username', '$email', '$hashPassword','$foo','$foo','$foo','$foo','$foo','$foo')";
         mysqli_query($db, $create_query);
         $response = [
             "ok" => true,

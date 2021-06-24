@@ -8,6 +8,11 @@ $result = mysqli_query($db, $query);
 $data = [];
 while($row = mysqli_fetch_array($result, MYSQLI_ASSOC))
 {
+    $_id = $row['_id'];
+    $comments_query = "SELECT count(*) as total FROM comments WHERE restaurant_id='$_id'";
+    $count_result=mysqli_query($db,$comments_query);
+    $total=$count_result->fetch_assoc();
+    $row['total'] = $total['total'];
     array_push($data,$row);
 }
 if(!$data){
@@ -22,6 +27,6 @@ send_response($response,203);
 $response = [
     "ok"=>true,
     "data"=>$data,
-    "errors"=>""
+    "errors"=>$db->error
 ];
 send_response($response,200);

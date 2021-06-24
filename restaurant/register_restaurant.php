@@ -25,6 +25,8 @@ $address = mysqli_real_escape_string($db, $data['address']);
 $number = mysqli_real_escape_string($db, $data['number']);
 $intro = mysqli_real_escape_string($db, $data['intro']);
 $main_area = mysqli_real_escape_string($db, $data['main_area']);
+$food_time =json_decode($data['time']);
+$food_type =json_decode($data['food_type']);
 if (empty($name)) {
     array_push($valid_errors, "餐廳名稱?");
 }
@@ -37,15 +39,42 @@ if (empty($number)) {
 if (empty($intro)) {
     array_push($valid_errors, "餐廳介紹?");
 }
-
+if (empty($main_area)) {
+    array_push($valid_errors, "餐廳地區?");
+}
+if ($food_time[0]=='時段') {
+    array_push($valid_errors, "餐廳時段?");
+}
+if ($food_type[0]=='類型') {
+    array_push($valid_errors, "餐廳類型?");
+}
 if($valid_errors){
     $response = [
         "ok" => false,
         "data" => $data,
         "errors" => $valid_errors,
+        "d"=>$food_time 
     ];
     send_response($response,203);
 } 
+
+$search_address = $data['address'];
+$url = "https://maps.googleapis.com/maps/api/geocode/json?address=$search_address&key=".googleAPIKey;
+$response_json = json_decode(file_get_contents($url));
+$req = $response_json->{'results'}[0]->{'geometry'}->{'location'};
+
+if($response_json->{'status'}=="ZERO_RESULTS"){
+    array_push($valid_errors, "地址找不到");
+    $response = [
+        "ok" => false,
+        "data" => $data,
+        "errors" => $valid_errors
+    ];
+    send_response($response, 203);
+}
+
+
+
 
 
 if(!$data['main_pic']||!$data['other_pic_1']||!$data['other_pic_2']){
@@ -99,9 +128,13 @@ if (count($valid_errors) == 0) {
   $main_pic_path=  mysqli_real_escape_string($db,save_file($main_pic['data'],$main_pic['type']));
   $other_pic_1_path=  mysqli_real_escape_string($db,save_file($other_pic_1['data'],$other_pic_1['type']));
   $other_pic_2_path= mysqli_real_escape_string($db,save_file($other_pic_2['data'],$other_pic_2['type'])); 
+  $lat = $req->{'lat'};
+    $lng = $req->{'lng'};
+  $hours = implode(",",$food_time);
+  $new_food_type=implode(",",$food_type);
   $_id = bin2hex(openssl_random_pseudo_bytes(8));
-  $create_query = "INSERT INTO restaurants (id,_id, name, review_star, Introduction, address, phone_number, main_area, hours, main_pic, other_pic_1,other_pic_2, owner_id) 
-        VALUES(null,'$_id','$name', 0.5, '$intro','$address','$number','$main_area','0','$main_pic_path','$other_pic_1_path','$other_pic_2_path','$user_id')";
+  $create_query = "INSERT INTO restaurants (id,_id, name, review_star, Introduction, address, phone_number, main_area, hours,lat,lng,food_type, main_pic, other_pic_1,other_pic_2, owner_id) 
+        VALUES(null,'$_id','$name', 0, '$intro','$address','$number','$main_area','$hours','$lat','$lng','$new_food_type','$main_pic_path','$other_pic_1_path','$other_pic_2_path','$user_id')";
    if(mysqli_query($db, $create_query)){
     $response = [
         "ok" => true,

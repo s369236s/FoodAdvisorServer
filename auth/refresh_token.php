@@ -10,8 +10,10 @@ use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 
 $token=null;
-if(isset($_COOKIE['jid']))
-$token = $_COOKIE['jid'];
+// if(isset($_COOKIE['jid']))
+// $token = $_COOKIE['jid'];
+$_POST = json_decode(file_get_contents("php://input"),true);
+$token = $_POST['refreshToken']; //localStorge
 
 if (!$token) send_response('no cookie', 203);
 
@@ -52,6 +54,7 @@ if(!$user){
 $response = [
     "ok"=>true,
     "_id"=>$user['_id'],
-    "accessToken" => create_access_token($username,$email)
+    "accessToken" => create_access_token($username,$email),
+    "Test"=>$token
 ];
 send_response($response,200);

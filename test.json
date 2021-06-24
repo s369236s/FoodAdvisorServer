@@ -1,0 +1,68 @@
+{
+  "results": [
+    {
+      "address_components": [
+        {
+          "long_name": "135",
+          "short_name": "135",
+          "types": ["street_number"]
+        },
+        {
+          "long_name": "遠東路",
+          "short_name": "遠東路",
+          "types": ["route"]
+        },
+        {
+          "long_name": "永豐里",
+          "short_name": "永豐里",
+          "types": ["administrative_area_level_4", "political"]
+        },
+        {
+          "long_name": "中壢區",
+          "short_name": "中壢區",
+          "types": ["administrative_area_level_3", "political"]
+        },
+        {
+          "long_name": "桃園市",
+          "short_name": "桃園市",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "台灣",
+          "short_name": "TW",
+          "types": ["country", "political"]
+        },
+        {
+          "long_name": "320",
+          "short_name": "320",
+          "types": ["postal_code"]
+        }
+      ],
+      "formatted_address": "320台灣桃園市中壢區遠東路135號",
+      "geometry": {
+        "location": {
+          "lat": 24.9701632,
+          "lng": 121.2674614
+        },
+        "location_type": "ROOFTOP",
+        "viewport": {
+          "northeast": {
+            "lat": 24.9715121802915,
+            "lng": 121.2688103802915
+          },
+          "southwest": {
+            "lat": 24.9688142197085,
+            "lng": 121.2661124197085
+          }
+        }
+      },
+      "place_id": "ChIJzT_UkFQfaDQRKzMr5ae1bhg",
+      "plus_code": {
+        "compound_code": "X7C8+3X 台灣桃園市中壢區",
+        "global_code": "7QP3X7C8+3X"
+      },
+      "types": ["establishment", "point_of_interest", "university"]
+    }
+  ],
+  "status": "OK"
+}

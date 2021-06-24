@@ -93,7 +93,30 @@ if (count($valid_errors) == 0) {
     $pic_path=  mysqli_real_escape_string($db,save_file($pic['data'],$pic['type']));
     $_id = bin2hex(openssl_random_pseudo_bytes(8));
     $comment_date = date("Y-m-d H:i:s");
-    $create_query = "INSERT INTO comments (id, _id, content, title, review_star, food_star, speed_star, pic, user_id, restaurant_id,comment_date,price_star) VALUES (NULL, '$_id', '$content', '$title', '$review_star', '$food_star', '$speed_star', '$pic_path', '$user_id', '$restaurant_id','$comment_date','$price_star')";
+
+    $user_query = "SELECT username,recent_comment_1,recent_comment_2,recent_comment_3 FROM users WHERE _id='$user_id' LIMIT 1";
+    $user_query_result = mysqli_query($db, $user_query);
+    $user = $user_query_result->fetch_assoc();
+
+    if(!$user['recent_comment_1']){
+        $recent_query = "UPDATE users SET recent_comment_1='$restaurant_id' WHERE _id='$user_id'";
+    }else if(!$user['recent_comment_2']){
+        $recent_query = "UPDATE users SET recent_comment_2='$restaurant_id' WHERE _id='$user_id'";
+    }else if(!$user['recent_comment_3']){
+        $recent_query = "UPDATE users SET recent_comment_3='$restaurant_id' WHERE _id='$user_id'";
+    }else{
+        $temp_1=$user['recent_comment_1'];
+        $temp_2=$user['recent_comment_2'];
+        $recent_query = "UPDATE users SET recent_comment_1='$restaurant_id',recent_comment_2='$temp_1',recent_comment_3='$temp_2' WHERE _id='$user_id'";
+    }
+
+
+    mysqli_query($db, $recent_query);
+
+    $user_name  = $user['username'];
+
+
+    $create_query = "INSERT INTO comments (id, _id, content, title, review_star, food_star, speed_star, pic, user_id, restaurant_id,comment_date,price_star,user_name) VALUES (NULL, '$_id', '$content', '$title', '$review_star', '$food_star', '$speed_star', '$pic_path', '$user_id', '$restaurant_id','$comment_date','$price_star','$user_name')";
       mysqli_query($db, $create_query);
       $comments_query = "SELECT review_star,food_star,speed_star,price_star FROM comments WHERE restaurant_id='$restaurant_id'";
       $comments_query_result = mysqli_query($db, $comments_query);

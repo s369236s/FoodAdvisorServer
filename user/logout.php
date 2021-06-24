@@ -2,7 +2,8 @@
 header('Access-Control-Allow-Credentials: true');
 require_once('../controller/send_response.php');
 $token= null;
-
+// using localStorage stores token
+//!!!! This page is useless
 if(isset($_COOKIE['jid']))
 {
     $token = $_COOKIE['jid'];

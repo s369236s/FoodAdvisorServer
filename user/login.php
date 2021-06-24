@@ -7,6 +7,7 @@ require_once('../module/jwt/src/JWT.php');
 
 $db = mysqli_connect(DB, DBUSERNAME, DBPASSWORD, DBTABLE);
 $req_body = json_decode(file_get_contents('php://input'));
+
 if(isset($req_body)){
     $valid_errors = [];
     $data =  [];
@@ -61,12 +62,14 @@ if(isset($req_body)){
             'expires' => time() + 60*60*24*7,
             'path' => '/',
             );
-        setcookie("jid",$refresh_token,$cookie_options);
+        // setcookie("jid",$refresh_token,$cookie_options);
+        
         $response = [
             "ok"=>true,
             "data"=> new stdClass(),
             "errors"=>$valid_errors,
-            "accessToken" =>$access_token
+            "accessToken" =>$access_token,
+            "refreshToken"=>$refresh_token
         ];
         send_response($response,200);
     }
